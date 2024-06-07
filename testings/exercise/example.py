@@ -1,12 +1,9 @@
 from flask import Flask, request, jsonify
 import requests
-import logging
 
 # Initialize Flask application
 app = Flask(__name__)
 
-# Configure logging to write to a file with INFO level
-logging.basicConfig(filename='./testings/exercise/myapp.log', level=logging.INFO)
 
 def get_coordinates(query):
     try:
@@ -44,7 +41,6 @@ def get_coordinates_endpoint():
     
     # Return an error if the 'query' parameter is missing
     if not query:
-        logging.error("Query parameter is required")
         return jsonify({"error": "Query parameter is required"}), 400
     
     # Get the coordinates for the query
@@ -52,13 +48,16 @@ def get_coordinates_endpoint():
     
     # Return the coordinates if the result is a tuple
     if isinstance(result, tuple):
-        logging.info(f"Query: {query}, Result: {result}")
         return jsonify({"latitude": result[0], "longitude": result[1]})
     else:
         # Return an error message if the result is not a tuple
-        logging.error(f"Query: {query}, Error: {result}")
         return jsonify({"error": result}), 400
+    
+# Add a health check endpoint
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "UP"}), 200
 
 # Run the application in debug mode if executed directly
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000, host='0.0.0.0')

@@ -11,10 +11,13 @@ TEST_SCRIPT = ./testings/test_structural.py
 STRESS_SCENARIO = ./stress_test/scenario1/scenario.yaml
 STRESS_LOG = ./stress_test/stress.log
 
-# Define tasks
-run: start_flask run_coverage run_stressor stop_flask
+# Define tasks change star_flask with start_docker if you want to run the server in a docker container
+run: start_docker run_coverage run_stressor stop_flask
 
 # Launch Flask server
+start_docker:
+	docker-compose up --build -d
+
 start_flask:
 	powershell -Command "Start-Process -NoNewWindow -FilePath '$(PYTHONW)' -ArgumentList '$(FLASK_APP_SCRIPT)'"
 
