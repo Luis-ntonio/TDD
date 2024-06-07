@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 import requests
+import logging
 
 app = Flask(__name__)
-
+logging.basicConfig(filename='./testings/exercise/myapp.log', level=logging.INFO)
 def get_coordinates(query):
     try:
         if query == "not covered":
@@ -25,11 +26,14 @@ def get_coordinates(query):
 def get_coordinates_endpoint():
     query = request.args.get('query')
     if not query:
+        logging.error("Query parameter is required")
         return jsonify({"error": "Query parameter is required"}), 400
     result = get_coordinates(query)
     if isinstance(result, tuple):
+        logging.info(f"Query: {query}, Result: {result}")
         return jsonify({"latitude": result[0], "longitude": result[1]})
     else:
+        logging.error(f"Query: {query}, Error: {result}")
         return jsonify({"error": result}), 400
 
 if __name__ == '__main__':
