@@ -14,16 +14,20 @@ STRESS_LOG = ./stress_test/stress.log
 # Define tasks
 run: start_flask run_coverage run_stressor stop_flask
 
+# Launch Flask server
 start_flask:
 	powershell -Command "Start-Process -NoNewWindow -FilePath '$(PYTHONW)' -ArgumentList '$(FLASK_APP_SCRIPT)'"
 
+# Testing with coverage
 run_coverage:
 	$(COVERAGE) run --data-file=$(COVERAGE_FILE) -m pytest $(TEST_SCRIPT)
 	$(COVERAGE) report --data-file=$(COVERAGE_FILE) -m
 
+# Stress testing
 run_stressor:
 	$(STRESSOR) run $(STRESS_SCENARIO) --log $(STRESS_LOG)
 
+# Stop Flask server
 stop_flask:
 	-@taskkill /F /IM pythonw.exe /T 2> NUL || echo "No pythonw.exe process found."
 
