@@ -20,3 +20,24 @@ def test_endpoint_returns_something():
 def test_the_result_is_correct_for_simple_cases():
     ret = get_coordinates("Lima,Peru")
     assert ret == (-12.0621065, -77.0365256)
+
+def test_the_result_is_correct_for_all_inputs():
+    cases = [
+        "Lima,Peru",
+        "New York,USA",
+        "Paris,France",
+        "not covered",
+        "Berlin,Germany",
+        "Tokyo,Japan",
+    ]
+    expected = [
+        (-12.0621065, -77.0365256),
+        (40.7127281, -74.0060152),
+        (48.8588897, 2.320041),
+        (1, 1),
+        (52.5170365, 13.3888599),
+        (35.6821936, 139.762221),
+    ]
+    for i in range(len(cases)):
+        ret = get_coordinates(cases[i])
+        assert abs(ret[0] - expected[i][0]) < 0.1
