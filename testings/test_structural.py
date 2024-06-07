@@ -1,25 +1,24 @@
 import pytest
-from exercise.example import get_coordinates
+import requests
 
+BASE_URL = 'http://127.0.0.1:5000'
 
 def test_can_call_existing_endpoints_of_the_API():
-    ret = get_coordinates("Lima,Peru")
-    assert ret is not None
+    response = requests.get(f'{BASE_URL}/get_coordinates', params={'query': 'Lima,Peru'})
+    assert response.status_code == 200
 
 def test_cannot_call_non_existing_endpoints_of_the_API():
-    try:
-        from exercise.example import something_not_existent
-        ret = something_not_existent("bla bla")
-    except:
-        assert True, "Exception raised"
+    response = requests.get(f'{BASE_URL}/non_existing_endpoint')
+    assert response.status_code == 404
 
 def test_endpoint_returns_something():
-    ret = get_coordinates("Lima,Peru")
-    assert ret is not None
+    response = requests.get(f'{BASE_URL}/get_coordinates', params={'query': 'Lima,Peru'})
+    assert response.json() is not None
 
 def test_the_result_is_correct_for_simple_cases():
-    ret = get_coordinates("Lima,Peru")
-    assert ret == (-12.0621065, -77.0365256)
+    response = requests.get(f'{BASE_URL}/get_coordinates', params={'query': 'Lima,Peru'})
+    data = response.json()
+    assert (data['latitude'], data['longitude']) == (-12.0621065, -77.0365256)
 
 def test_the_result_is_correct_for_all_inputs():
     cases = [
@@ -39,5 +38,12 @@ def test_the_result_is_correct_for_all_inputs():
         (35.6821936, 139.762221),
     ]
     for i in range(len(cases)):
-        ret = get_coordinates(cases[i])
-        assert abs(ret[0] - expected[i][0]) < 0.1
+        response = requests.get(f'{BASE_URL}/get_coordinates', params={'query': cases[i]})
+        data = response.json()
+        assert abs(data['latitude'] - expected[i][0]) < 0.1
+        assert abs(data['longitude'] - expected[i][1]) < 0.1
+
+def test_result_not_found_results():
+    response = requests.get(f'{BASE_URL}/get_coordinates', params={'query': 'abcdefghijklmnoqrstuvwxyz'})
+    data = response.json()
+    assert "No results found" in data['error']

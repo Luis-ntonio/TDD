@@ -1,5 +1,7 @@
+from flask import Flask, request, jsonify
 import requests
 
+app = Flask(__name__)
 
 def get_coordinates(query):
     try:
@@ -17,4 +19,18 @@ def get_coordinates(query):
         )
         return lat_lon
     except Exception as e:
-        return e
+        return str(e)
+
+@app.route('/get_coordinates', methods=['GET'])
+def get_coordinates_endpoint():
+    query = request.args.get('query')
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+    result = get_coordinates(query)
+    if isinstance(result, tuple):
+        return jsonify({"latitude": result[0], "longitude": result[1]})
+    else:
+        return jsonify({"error": result}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)

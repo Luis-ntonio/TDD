@@ -1,0 +1,69 @@
+# ----------------------------------------------------------------------------
+# Stressor Scenario Definition
+# See
+#   - https://stressor.readthedocs.io/
+#   - https://stressor.readthedocs.io/en/latest/ug_reference.html
+#
+# Auto-generated 2024-06-07 13:09:52.609455
+# ----------------------------------------------------------------------------
+file_version: stressor#0
+
+
+config:
+  name: 'NAME'
+  tag: 'TAG'
+
+  details: |
+    Auto-generated 2024-06-07 13:09:52.609455
+
+  #: (str)
+  base_url: 'None'
+
+  #: Optional string that describes the current run.
+  #: May be used to display additional info about boundary conditions, etc.
+  #: Example 'Test-Run STAGING nightly'
+  #: (pass `-o "tag:MY TAG INFO"` to override)
+#  tag:
+  #: (int) Output verbosity level [0..5], default: 3
+#  verbose: 3
+  #: (float) Default timeout on seconds for web requests (i.e. HTTP activities)
+  #: This value can be overridden with HTTP-Activity's `timeout` parameter
+  request_timeout: 10.0
+  #: (int) Max. total error count that is tolerated before stopping
+  #: Override with `--max-errors` argument.
+  #: Default: 0: don't stop on errors
+#  max_errors: 0
+  #: (float) Max. run time in seconds before stopping (override with `--max-time`)
+  #: Default: 0.0: no time limit
+#  max_time: 0.0
+
+context:
+
+sessions:
+  users: $load(users.yaml)
+  count: 3
+  basic_auth: false
+  verify_ssl: false
+  ramp_up_delay: 0
+
+# Define what actions should be performed by every session
+scenario:
+  - sequence: init
+  - sequence: main
+    duration: 10
+    # repeat: 3
+  - sequence: end
+
+# List of named action sequences. Used as building blocks for scenarios
+sequences:
+  # 'init' is the reserved name for the set-up sequence.
+  init:
+    - activity: Sleep
+      duration: 0.1
+
+  # Other sections can have arbitrary names and are excuted in order of appearance
+  main: $load(main_sequence.yaml)
+
+  # 'end' is the reserved name for the tear-down sequence
+  end:
+    - activity: $sleep(0.1)
