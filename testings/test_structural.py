@@ -71,5 +71,3 @@ def test_result_not_found_results():
     )
     data = response.json()
     assert "No results found" in data["error"]
-
-
